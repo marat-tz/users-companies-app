@@ -1,10 +1,10 @@
-package com.usercompanies.service;
+package com.userscompanies.service;
 
-import com.usercompanies.dto.CompanyDto;
-import com.usercompanies.exception.ConflictException;
-import com.usercompanies.mapper.CompanyMapper;
-import com.usercompanies.model.Company;
-import com.usercompanies.repository.CompanyRepository;
+import com.userscompanies.dto.CompanyDto;
+import com.userscompanies.exception.ConflictException;
+import com.userscompanies.mapper.CompanyMapper;
+import com.userscompanies.model.Company;
+import com.userscompanies.repository.CompanyRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

@@ -1,4 +1,4 @@
-package com.usercompanies.exception;
+package com.userscompanies.exception;
 
 import lombok.Value;
 

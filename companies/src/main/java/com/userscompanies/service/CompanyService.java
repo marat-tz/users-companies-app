@@ -1,6 +1,6 @@
-package com.usercompanies.service;
+package com.userscompanies.service;
 
-import com.usercompanies.dto.CompanyDto;
+import com.userscompanies.dto.CompanyDto;
 
 import java.util.List;
 

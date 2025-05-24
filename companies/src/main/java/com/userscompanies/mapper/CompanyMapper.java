@@ -1,7 +1,7 @@
-package com.usercompanies.mapper;
+package com.userscompanies.mapper;
 
-import com.usercompanies.dto.CompanyDto;
-import com.usercompanies.model.Company;
+import com.userscompanies.dto.CompanyDto;
+import com.userscompanies.model.Company;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;

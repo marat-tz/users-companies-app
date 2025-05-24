@@ -1,10 +1,13 @@
-package com.usercompanies.model;
+package com.userscompanies.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,6 +15,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -31,6 +36,12 @@ public class Company {
 
     @Column(nullable = false)
     Long budget;
+
+    @JoinTable(name = "companies_users",
+            joinColumns = @JoinColumn(name = "company_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
+    @ManyToMany
+    List<User> employees;
 
 }
 

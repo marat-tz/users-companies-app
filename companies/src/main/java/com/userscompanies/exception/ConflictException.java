@@ -1,4 +1,4 @@
-package com.usercompanies.exception;
+package com.userscompanies.exception;
 
 public class ConflictException extends RuntimeException {
     public ConflictException(String message) {

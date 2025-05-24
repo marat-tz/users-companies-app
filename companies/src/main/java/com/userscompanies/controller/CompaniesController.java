@@ -1,7 +1,7 @@
-package com.usercompanies.controller;
+package com.userscompanies.controller;
 
-import com.usercompanies.dto.CompanyDto;
-import com.usercompanies.service.CompanyService;
+import com.userscompanies.dto.CompanyDto;
+import com.userscompanies.service.CompanyService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -19,16 +19,16 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/users")
+@RequestMapping(path = "/companies")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CompaniesController {
 
     final CompanyService companyService;
 
-    @GetMapping("/{userId}")
-    public CompanyDto findCompanyById(@PathVariable Long userId) {
-        return companyService.findCompanyById(userId);
+    @GetMapping("/{companyId}")
+    public CompanyDto findCompanyById(@PathVariable Long companyId) {
+        return companyService.findCompanyById(companyId);
     }
 
     @PostMapping
@@ -37,10 +37,10 @@ public class CompaniesController {
         return companyService.createCompany(dto);
     }
 
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("/{companyId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCompany(@PathVariable Long userId) {
-        companyService.deleteCompany(userId);
+    public void deleteCompany(@PathVariable Long companyId) {
+        companyService.deleteCompany(companyId);
     }
 
     @GetMapping
