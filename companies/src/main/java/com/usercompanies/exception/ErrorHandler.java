@@ -1,8 +1,5 @@
 package com.usercompanies.exception;
 
-import com.userscompanies.exception.ConflictException;
-import com.userscompanies.exception.NotFoundException;
-import com.userscompanies.exception.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
