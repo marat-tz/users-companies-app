@@ -18,7 +18,7 @@
     <dependencies>
         <dependency>
             <groupId>com.userscompanies</groupId>
-            <artifactId>companies</artifactId>
+            <artifactId>api</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
