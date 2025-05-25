@@ -19,7 +19,7 @@ import lombok.experimental.FieldDefaults;
 import java.util.List;
 
 @Entity
-@Table(name = "users")
+@Table(name = "companies")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -31,17 +31,11 @@ public class Company {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     String name;
 
     @Column(nullable = false)
     Long budget;
-
-    @JoinTable(name = "companies_users",
-            joinColumns = @JoinColumn(name = "company_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
-    @ManyToMany
-    List<User> employees;
 
 }
 

@@ -1,4 +1,0 @@
-spring:
-  datasource:
-    initialization-mode: always
-    schema: classpath:schema.sql

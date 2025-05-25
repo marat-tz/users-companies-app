@@ -16,10 +16,10 @@ logging:
 #      wire: DEBUG
 
 server:
-  port: 8080
+  port: 9090
 
-companies:
-  url: http://companies:9090
+users:
+  url: http://users:8080
 
 spring:
   jpa:

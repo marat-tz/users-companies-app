@@ -15,7 +15,6 @@
     <modules>
         <module>users</module>
         <module>companies</module>
-        <module>database</module>
     </modules>
 
     <groupId>com.userscompanies</groupId>
