@@ -19,7 +19,7 @@ server:
   port: 8080
 
 companies:
-  url: http://companies:9090
+  url: http://localhost:9090
 
 spring:
   jpa:

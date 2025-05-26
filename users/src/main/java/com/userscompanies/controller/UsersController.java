@@ -1,6 +1,7 @@
 package com.userscompanies.controller;
 
-import com.userscompanies.dto.UserDto;
+import com.userscompanies.dto.UserDtoRequest;
+import com.userscompanies.dto.UserDtoResponse;
 import com.userscompanies.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,13 +28,13 @@ public class UsersController {
     final UserService userService;
 
     @GetMapping("/{userId}")
-    public UserDto findUserById(@PathVariable Long userId) {
+    public UserDtoResponse findUserById(@PathVariable Long userId) {
         return userService.findUserById(userId);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto createUser(@Valid @RequestBody UserDto dto) {
+    public UserDtoResponse createUser(@Valid @RequestBody UserDtoRequest dto) {
         return userService.createUser(dto);
     }
 
@@ -45,7 +45,7 @@ public class UsersController {
     }
 
     @GetMapping
-    public List<UserDto> findUsers() {
+    public List<UserDtoResponse> findUsers() {
         return userService.findUsers();
     }
 

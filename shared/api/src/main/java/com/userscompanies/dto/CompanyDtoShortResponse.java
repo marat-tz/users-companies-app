@@ -15,7 +15,7 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CompanyDto {
+public class CompanyDtoShortResponse {
     Long id;
 
     @NotBlank

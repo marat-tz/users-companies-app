@@ -19,7 +19,7 @@ server:
   port: 9090
 
 users:
-  url: http://users:8080
+  url: http://localhost:8080
 
 spring:
   jpa:

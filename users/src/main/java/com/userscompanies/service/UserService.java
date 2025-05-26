@@ -1,16 +1,16 @@
 package com.userscompanies.service;
 
-import com.userscompanies.dto.UserDto;
-import org.springframework.web.bind.annotation.PathVariable;
+import com.userscompanies.dto.UserDtoRequest;
+import com.userscompanies.dto.UserDtoResponse;
 
 import java.util.List;
 
 public interface UserService {
-    UserDto createUser(UserDto dto);
+    UserDtoResponse createUser(UserDtoRequest dto);
 
     void deleteUser(Long userId);
 
-    List<UserDto> findUsers();
+    List<UserDtoResponse> findUsers();
 
-    UserDto findUserById(Long userId);
+    UserDtoResponse findUserById(Long userId);
 }

@@ -1,15 +1,20 @@
 package com.userscompanies.service;
 
-import com.userscompanies.dto.CompanyDto;
+import com.userscompanies.dto.CompanyDtoFullResponse;
+import com.userscompanies.dto.CompanyDtoRequest;
+import com.userscompanies.dto.CompanyDtoShortResponse;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
 public interface CompanyService {
-    CompanyDto createCompany(CompanyDto dto);
+    CompanyDtoFullResponse createCompany(CompanyDtoRequest dto);
 
     void deleteCompany(Long companyId);
 
-    List<CompanyDto> findCompanies();
+    List<CompanyDtoFullResponse> findCompanies();
 
-    CompanyDto findCompanyById(Long userId);
+    CompanyDtoFullResponse findCompanyById(Long userId);
+
+    List<CompanyDtoShortResponse> findCompaniesByIds(List<Long> ids);
 }

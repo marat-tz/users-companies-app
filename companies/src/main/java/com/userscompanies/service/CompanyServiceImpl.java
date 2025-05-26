@@ -1,16 +1,20 @@
 package com.userscompanies.service;
 
-import com.userscompanies.dto.CompanyDto;
+import com.userscompanies.dto.CompanyDtoFullResponse;
+import com.userscompanies.dto.CompanyDtoRequest;
+import com.userscompanies.dto.CompanyDtoShortResponse;
 import com.userscompanies.exception.ConflictException;
 import com.userscompanies.exception.NotFoundException;
 import com.userscompanies.mapper.CompanyMapper;
 import com.userscompanies.model.Company;
-import com.userscompanies.model.User;
 import com.userscompanies.repository.CompanyRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,7 +29,7 @@ public class CompanyServiceImpl implements CompanyService {
     final CompanyMapper companyMapper;
 
     @Override
-    public CompanyDto createCompany(CompanyDto dto) {
+    public CompanyDtoFullResponse createCompany(CompanyDtoRequest dto) {
         log.info("Создание компании");
         if (companyRepository.existsByName(dto.getName())) {
             throw new ConflictException("Компания с указанным названием уже существует");
@@ -42,7 +46,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public List<CompanyDto> findCompanies() {
+    public List<CompanyDtoFullResponse> findCompanies() {
         log.info("Получение всех компаний");
         List<Company> companies = companyRepository.findAll();
         return companies.stream()
@@ -51,10 +55,18 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public CompanyDto findCompanyById(Long companyId) {
+    public CompanyDtoFullResponse findCompanyById(Long companyId) {
         log.info("Поиск компании по id");
         return companyMapper.toDto(companyRepository.findById(companyId).orElseThrow(() ->
                 new NotFoundException("Компания " + companyId + " не существует")));
+    }
+
+    @Override
+    public List<CompanyDtoShortResponse> findCompaniesByIds(List<Long> ids) {
+        List<Company> companies = companyRepository.findAllById(ids);
+        return companies.stream()
+                .map(companyMapper::toShortDto)
+                .toList();
     }
 
 }
