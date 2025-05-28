@@ -11,10 +11,12 @@ import com.userscompanies.mapper.UserMapper;
 import com.userscompanies.model.Company;
 import com.userscompanies.model.User;
 import com.userscompanies.repository.UserRepository;
+import feign.FeignException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,15 +37,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDtoResponse createUser(UserDtoRequest dto) {
         log.info("Создание пользователя");
+        ResponseEntity<Company> response;
+
         if (userRepository.existsByPhone(dto.getPhone())) {
             throw new ConflictException("Пользователь с указанной почтой уже существует");
         }
 
-        // TODO: здесь мы получаем на выход код 500, если компания не существует. Должен быть 404
-        Company company = companiesClient.findCompany(dto.getCompanyId()).orElseThrow(() ->
-                new ConflictException("Нельзя создать пользователя с несуществующей компанией"));
+        try {
+            response = companiesClient.findCompany(dto.getCompanyId());
+        } catch (FeignException.NotFound e) {
+            throw new NotFoundException("Нельзя создать пользователя с несуществующей компанией");
+        }
 
-        CompanyDtoShortResponse companyDtoShort = companyMapper.toShortDto(company);
+        CompanyDtoShortResponse companyDtoShort = companyMapper.toShortDto(response.getBody());
 
         User user = userRepository.save(userMapper.toEntity(dto));
         return userMapper.toDto(user, companyDtoShort);
@@ -82,12 +88,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDtoResponse findUserById(Long userId) {
         log.info("Получение пользователя по id");
+        ResponseEntity<Company> response;
+
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь " + userId + " не существует"));
 
-        Company company = companiesClient.findCompany(user.getCompanyId()).orElseThrow(() ->
-                new NotFoundException("Компания " + user.getCompanyId() + " не найдена"));
+        try {
+            response = companiesClient.findCompany(user.getCompanyId());
+        } catch (FeignException.NotFound e) {
+            throw new NotFoundException("Компания " + user.getCompanyId() + " не найдена");
+        }
 
-        return userMapper.toDto(user, companyMapper.toShortDto(company));
+        return userMapper.toDto(user, companyMapper.toShortDto(response.getBody()));
     }
 }
