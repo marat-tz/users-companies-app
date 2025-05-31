@@ -48,7 +48,7 @@ public class CompaniesController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CompanyDtoFullResponse createCompany(@Valid @RequestBody CompanyDtoRequest dto) {
+    public CompanyDtoShortResponse createCompany(@Valid @RequestBody CompanyDtoRequest dto) {
         return companyService.createCompany(dto);
     }
 

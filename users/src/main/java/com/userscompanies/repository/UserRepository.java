@@ -4,7 +4,10 @@ import com.userscompanies.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByPhone(String phone);
+    List<User> findAllByCompanyIdIn(List<Long> companyId);
 }

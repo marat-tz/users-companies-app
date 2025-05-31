@@ -10,7 +10,7 @@ public interface UserService {
 
     void deleteUser(Long userId);
 
-    List<UserDtoResponse> findUsers();
+    List<UserDtoResponse> findUsers(List<Long> companyId);
 
     UserDtoResponse findUserById(Long userId);
 }

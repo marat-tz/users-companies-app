@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 public interface CompanyService {
-    CompanyDtoFullResponse createCompany(CompanyDtoRequest dto);
+    CompanyDtoShortResponse createCompany(CompanyDtoRequest dto);
 
     void deleteCompany(Long companyId);
 

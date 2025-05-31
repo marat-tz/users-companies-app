@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
         ResponseEntity<Company> response;
 
         if (userRepository.existsByPhone(dto.getPhone())) {
-            throw new ConflictException("Пользователь с указанной почтой уже существует");
+            throw new ConflictException("Пользователь с указанным номером уже существует");
         }
 
         try {
@@ -62,9 +62,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDtoResponse> findUsers() {
+    public List<UserDtoResponse> findUsers(List<Long> companyId) {
         log.info("Получение всех пользователей");
-        List<User> users = userRepository.findAll();
+        List<User> users;
+
+        if (companyId == null) {
+            users = userRepository.findAll();
+        } else {
+            users = userRepository.findAllByCompanyIdIn(companyId);
+        }
 
         List<Long> companiesIds = users
                 .stream()

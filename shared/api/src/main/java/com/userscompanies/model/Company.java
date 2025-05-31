@@ -29,18 +29,7 @@ public class Company {
     @Column(nullable = false, unique = true)
     String name;
 
-    @Column(nullable = false)
+    @Column
     Long budget;
 
 }
-
-
-//     @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    User user;
-
-// @JoinTable(name = "compilations_events",
-//            joinColumns = @JoinColumn(name = "compilation_id", referencedColumnName = "id"),
-//            inverseJoinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id"))
-//    @ManyToMany
-//    List<Event> events;
