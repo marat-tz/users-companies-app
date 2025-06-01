@@ -2,8 +2,6 @@ package com.userscompanies.service;
 
 import com.userscompanies.dto.UserDtoRequest;
 import com.userscompanies.dto.UserDtoResponse;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
