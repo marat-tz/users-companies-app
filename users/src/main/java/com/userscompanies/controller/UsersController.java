@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +32,12 @@ public class UsersController {
     @GetMapping("/{userId}")
     public UserDtoResponse findUserById(@PathVariable Long userId) {
         return userService.findUserById(userId);
+    }
+
+    @PatchMapping("/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public UserDtoResponse updateUserById(@RequestBody UserDtoRequest dto, @PathVariable Long userId) {
+        return userService.updateUserById(dto, userId);
     }
 
     @PostMapping

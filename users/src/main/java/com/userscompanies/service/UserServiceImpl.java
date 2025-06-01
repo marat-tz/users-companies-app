@@ -37,17 +37,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDtoResponse createUser(UserDtoRequest dto) {
         log.info("Создание пользователя");
-        ResponseEntity<Company> response;
 
         if (userRepository.existsByPhone(dto.getPhone())) {
             throw new ConflictException("Пользователь с указанным номером уже существует");
         }
 
-        try {
-            response = companiesClient.findCompany(dto.getCompanyId());
-        } catch (FeignException.NotFound e) {
-            throw new NotFoundException("Нельзя создать пользователя с несуществующей компанией");
-        }
+        ResponseEntity<Company> response = getCompanyById(dto.getCompanyId());
 
         CompanyDtoShortResponse companyDtoShort = companyMapper.toShortDto(response.getBody());
 
@@ -94,17 +89,54 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDtoResponse findUserById(Long userId) {
         log.info("Получение пользователя по id");
-        ResponseEntity<Company> response;
 
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь " + userId + " не существует"));
 
-        try {
-            response = companiesClient.findCompany(user.getCompanyId());
-        } catch (FeignException.NotFound e) {
-            throw new NotFoundException("Компания " + user.getCompanyId() + " не найдена");
-        }
+        ResponseEntity<Company> response = getCompanyById(user.getCompanyId());
 
         return userMapper.toDto(user, companyMapper.toShortDto(response.getBody()));
+    }
+
+    @Override
+    public UserDtoResponse updateUserById(UserDtoRequest dto, Long userId) {
+
+        CompanyDtoShortResponse companyDto = null;
+
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException("Пользователь " + userId + " не существует"));
+
+        if (dto.getFirstName() != null && !dto.getFirstName().isBlank()) {
+            user.setFirstName(dto.getFirstName());
+        }
+
+        if (dto.getLastName() != null && !dto.getLastName().isBlank()) {
+            user.setLastName(dto.getLastName());
+        }
+
+        if (dto.getPhone() != null && !dto.getPhone().isBlank()) {
+            user.setPhone(dto.getPhone());
+        }
+
+        if (dto.getCompanyId() != null && dto.getCompanyId() > 0) {
+            ResponseEntity<Company> response = getCompanyById(dto.getCompanyId());
+            if (response.getStatusCode().is2xxSuccessful()) {
+                user.setCompanyId(dto.getCompanyId());
+                companyDto = companyMapper.toShortDto(response.getBody());
+            } else {
+                throw new NotFoundException("Ошибка при попытке обновить компанию пользователя");
+            }
+        }
+
+        User result = userRepository.save(user);
+        return userMapper.toDto(result, companyDto);
+    }
+
+    private ResponseEntity<Company> getCompanyById(Long companyId) {
+        try {
+            return companiesClient.findCompany(companyId);
+        } catch (FeignException.NotFound e) {
+            throw new NotFoundException("Компания " + companyId + " не найдена");
+        }
     }
 }
