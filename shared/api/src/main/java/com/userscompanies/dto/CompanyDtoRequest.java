@@ -22,5 +22,5 @@ public class CompanyDtoRequest {
     @Size(min = 1, max = 250)
     String name;
 
-    Long budget;
+    Double budget;
 }

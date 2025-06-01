@@ -25,7 +25,7 @@ public class CompanyDtoFullResponse {
     String name;
 
     @NotNull
-    Long budget;
+    Double budget;
 
     List<UserDtoResponse> users;
 }

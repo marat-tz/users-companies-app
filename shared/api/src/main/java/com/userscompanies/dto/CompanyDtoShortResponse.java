@@ -23,5 +23,5 @@ public class CompanyDtoShortResponse {
     String name;
 
     @NotNull
-    Long budget;
+    Double budget;
 }
