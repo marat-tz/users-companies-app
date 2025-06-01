@@ -30,6 +30,6 @@ public class Company {
     String name;
 
     @Column
-    Long budget;
+    Double budget;
 
 }

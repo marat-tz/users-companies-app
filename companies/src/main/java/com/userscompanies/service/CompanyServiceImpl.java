@@ -88,4 +88,22 @@ public class CompanyServiceImpl implements CompanyService {
                 .map(companyMapper::toShortDto)
                 .toList();
     }
+
+    @Override
+    public CompanyDtoShortResponse updateCompanyById(CompanyDtoRequest dto, Long companyId) {
+
+        Company company = companyRepository.findById(companyId).orElseThrow(() ->
+                new NotFoundException("Компания " + companyId + " не существует"));
+
+        if (dto.getName() != null && !dto.getName().isBlank()) {
+            company.setName(dto.getName());
+        }
+
+        if (dto.getBudget() != null && dto.getBudget() >= 0) {
+            company.setBudget(dto.getBudget());
+        }
+
+        Company result = companyRepository.save(company);
+        return companyMapper.toShortDto(result);
+    }
 }

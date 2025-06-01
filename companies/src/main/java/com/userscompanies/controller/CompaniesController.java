@@ -3,6 +3,8 @@ package com.userscompanies.controller;
 import com.userscompanies.dto.CompanyDtoFullResponse;
 import com.userscompanies.dto.CompanyDtoRequest;
 import com.userscompanies.dto.CompanyDtoShortResponse;
+import com.userscompanies.dto.UserDtoRequest;
+import com.userscompanies.dto.UserDtoResponse;
 import com.userscompanies.service.CompanyService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -12,6 +14,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,6 +47,12 @@ public class CompaniesController {
     @GetMapping("/ids")
     public List<CompanyDtoShortResponse> findCompaniesByIds(@RequestParam(required = false) List<Long> ids) {
         return companyService.findCompaniesByIds(ids);
+    }
+
+    @PatchMapping("/{companyId}")
+    @ResponseStatus(HttpStatus.OK)
+    public CompanyDtoShortResponse updateCompanyById(@RequestBody CompanyDtoRequest dto, @PathVariable Long companyId) {
+        return companyService.updateCompanyById(dto, companyId);
     }
 
     @PostMapping
