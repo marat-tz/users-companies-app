@@ -19,7 +19,7 @@ server:
   port: 9090
 
 users:
-  url: http://localhost:8080
+  url: http://users:8080
 
 spring:
   jpa:
@@ -36,9 +36,9 @@ spring:
       mode: always
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/users-companies
-    username: postgres
-    password: admin
-#    url: jdbc:postgresql://ewm-db:5432/ewmdb
-#    username: ewmdb
-#    password: ewmdb
+    url: jdbc:postgresql://companies-db:5432/companies
+    username: companies
+    password: companies
+#    url: jdbc:postgresql://localhost:5432/users-companies
+#    username: postgres
+#    password: admin
