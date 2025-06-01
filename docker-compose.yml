@@ -1,0 +1,46 @@
+services:
+  companies-db:
+    image: postgres:14-alpine
+    container_name: companies-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: companies
+      POSTGRES_PASSWORD: companies
+      POSTGRES_DB: companies
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  companies:
+    build: companies
+    container_name: companies
+    ports:
+      - "9090:9090"
+    depends_on:
+      - companies-db
+
+  users-db:
+    image: postgres:14-alpine
+    container_name: users-db
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: users
+      POSTGRES_PASSWORD: users
+      POSTGRES_DB: users
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  users:
+    build: users
+    container_name: users
+    ports:
+      - "8080:8080"
+    depends_on:
+      - users-db

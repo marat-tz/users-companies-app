@@ -1,6 +1,7 @@
 package com.userscompanies.controller;
 
-import com.userscompanies.dto.UserDto;
+import com.userscompanies.dto.UserDtoRequest;
+import com.userscompanies.dto.UserDtoResponse;
 import com.userscompanies.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -9,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,13 +30,19 @@ public class UsersController {
     final UserService userService;
 
     @GetMapping("/{userId}")
-    public UserDto findUserById(@PathVariable Long userId) {
+    public UserDtoResponse findUserById(@PathVariable Long userId) {
         return userService.findUserById(userId);
+    }
+
+    @PatchMapping("/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public UserDtoResponse updateUserById(@RequestBody UserDtoRequest dto, @PathVariable Long userId) {
+        return userService.updateUserById(dto, userId);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto createUser(@Valid @RequestBody UserDto dto) {
+    public UserDtoResponse createUser(@Valid @RequestBody UserDtoRequest dto) {
         return userService.createUser(dto);
     }
 
@@ -45,8 +53,8 @@ public class UsersController {
     }
 
     @GetMapping
-    public List<UserDto> findUsers() {
-        return userService.findUsers();
+    public List<UserDtoResponse> findUsers(@RequestParam(required = false) List<Long> companyId) {
+        return userService.findUsers(companyId);
     }
 
 }
