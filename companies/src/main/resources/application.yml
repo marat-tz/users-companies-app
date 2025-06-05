@@ -31,12 +31,12 @@ spring:
       mode: always
   datasource:
     driver-class-name: org.postgresql.Driver
-#    url: jdbc:postgresql://companies-db:5432/companies
-#    username: companies
-#    password: companies
-    url: jdbc:postgresql://localhost:5432/users-companies
-    username: postgres
-    password: admin
+    url: jdbc:postgresql://companies-db:5432/companies
+    username: companies
+    password: companies
+#    url: jdbc:postgresql://localhost:5432/users-companies
+#    username: postgres
+#    password: admin
 
 eureka:
   client:
