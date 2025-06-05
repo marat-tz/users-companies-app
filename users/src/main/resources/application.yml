@@ -16,12 +16,15 @@ logging:
 #      wire: DEBUG
 
 server:
-  port: 8080
+  port: 9090
 
 companies:
-  url: http://companies:9090
+#  url: http://companies:9091
+  url: http://localhost:9091
 
 spring:
+  application:
+    name: users
   jpa:
     hibernate:
       ddl-auto: none
@@ -36,9 +39,16 @@ spring:
       mode: always
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://users-db:5432/users
-    username: users
-    password: users
-#    url: jdbc:postgresql://localhost:5432/users-companies
-#    username: postgres
-#    password: admin
+#    url: jdbc:postgresql://users-db:5432/users
+#    username: users
+#    password: users
+    url: jdbc:postgresql://localhost:5432/users-companies
+    username: postgres
+    password: admin
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka  # Адрес Eureka Server
+    register-with-eureka: true  # Регистрация включена (по умолчанию true)
+    fetch-registry: true        # Получение списка сервисов (по умолчанию true)
