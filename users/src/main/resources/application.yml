@@ -10,10 +10,6 @@ logging:
           jpa.JpaTransactionManager: DEBUG
         transaction: INFO
         transaction.interceptor: TRACE
-#    apache:
-#      http: DEBUG
-#    httpclient:
-#      wire: DEBUG
 
 server:
   port: 9090

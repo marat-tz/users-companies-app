@@ -3,7 +3,7 @@ logging:
     org.springframework.cloud.netflix.eureka: DEBUG
 
 server:
-  port: 8761  # Стандартный порт Eureka
+  port: 8761
 
 eureka:
   instance:
