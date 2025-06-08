@@ -100,11 +100,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDtoResponse updateUserById(UserDtoRequest dto, Long userId) {
-
-        CompanyDtoShortResponse companyDto = null;
+        log.info("Обновление пользователя");
+        log.info("id компании равен - {}", dto.getCompanyId());
 
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь " + userId + " не существует"));
+
+        ResponseEntity<Company> response = getCompanyById(dto.getCompanyId());
+        CompanyDtoShortResponse companyDto = companyMapper.toShortDto(response.getBody());
 
         if (dto.getFirstName() != null && !dto.getFirstName().isBlank()) {
             user.setFirstName(dto.getFirstName());
@@ -116,16 +119,6 @@ public class UserServiceImpl implements UserService {
 
         if (dto.getPhone() != null && !dto.getPhone().isBlank()) {
             user.setPhone(dto.getPhone());
-        }
-
-        if (dto.getCompanyId() != null && dto.getCompanyId() > 0) {
-            ResponseEntity<Company> response = getCompanyById(dto.getCompanyId());
-            if (response.getStatusCode().is2xxSuccessful()) {
-                user.setCompanyId(dto.getCompanyId());
-                companyDto = companyMapper.toShortDto(response.getBody());
-            } else {
-                throw new NotFoundException("Ошибка при попытке обновить компанию пользователя");
-            }
         }
 
         User result = userRepository.save(user);

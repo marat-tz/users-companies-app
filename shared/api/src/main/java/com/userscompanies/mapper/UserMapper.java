@@ -4,6 +4,7 @@ import com.userscompanies.dto.CompanyDtoShortResponse;
 import com.userscompanies.dto.UserDtoRequest;
 import com.userscompanies.dto.UserDtoResponse;
 import com.userscompanies.model.User;
+import jakarta.validation.constraints.NotNull;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;

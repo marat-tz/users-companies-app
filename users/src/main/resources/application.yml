@@ -41,6 +41,6 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://eureka-server:8761/eureka  # Адрес Eureka Server
+      defaultZone: http://eureka-server:8761/eureka  # eureka-server
     register-with-eureka: true  # Регистрация включена (по умолчанию true)
     fetch-registry: true        # Получение списка сервисов (по умолчанию true)
