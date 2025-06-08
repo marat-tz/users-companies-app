@@ -97,11 +97,7 @@
 											"    let company;\r",
 											"    try {\r",
 											"        user = await rnd.getUser();\r",
-											"        console.log(\"Попытка создать компанию (в коде теста):\");\r",
-											"        company = await api.addCompany(rnd.getCompany());\r",
-											"        console.log(\"Успешно создана компания:\", company);\r",
-											"        pm.collectionVariables.set(\"cid\", company.id);\r",
-											"        user.companyId = company.id + 1;\r",
+											"        user.companyId = 0;\r",
 											"\r",
 											"    } catch(err) {\r",
 											"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
@@ -242,6 +238,807 @@
 										"exec": [
 											"pm.test(\"Ответ должен содержать код статуса 409 и данные в формате json\", function () {\r",
 											"    pm.response.to.have.status(409);\r",
+											"    pm.response.to.be.withBody;\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{{request_body}}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{usersUrl}}/users",
+									"host": [
+										"{{usersUrl}}"
+									],
+									"path": [
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Обновление пользователя с несуществующей компанией",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const main = async () => {\r",
+											"    const api = new API(pm);\r",
+											"    const rnd = new RandomUtils();\r",
+											"    console.log(\"Добавление нового пользователя:\");\r",
+											"\r",
+											"    let user;\r",
+											"    let newUser;\r",
+											"    let company1;\r",
+											"    try {\r",
+											"        company1 = await api.addCompany(rnd.getCompany());\r",
+											"        pm.collectionVariables.set(\"cid\", company1.id);\r",
+											"\r",
+											"        user = await api.addUser(rnd.getUser());\r",
+											"        pm.collectionVariables.set(\"uid\", user.id)\r",
+											"\r",
+											"        newUser = await rnd.getUser();\r",
+											"        newUser.companyId = 0\r",
+											"\r",
+											"    } catch(err) {\r",
+											"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+											"    }\r",
+											"\r",
+											"    pm.request.body.update({\r",
+											"        mode: 'raw',\r",
+											"        raw: JSON.stringify(newUser),\r",
+											"        options: { raw: { language: 'json' } }\r",
+											"    });\r",
+											"};\r",
+											"\r",
+											"const interval = setInterval(() => {}, 1000);\r",
+											"\r",
+											"setTimeout(async () => \r",
+											"    {\r",
+											"        try {\r",
+											"            await main();\r",
+											"        } catch (e) {\r",
+											"            console.error(e);\r",
+											"        } finally {\r",
+											"            clearInterval(interval);\r",
+											"        }\r",
+											"    },  \r",
+											"    100 \r",
+											");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Ответ должен содержать код статуса 404 и данные в формате json\", function () {\r",
+											"    pm.response.to.have.status(404);\r",
+											"    pm.response.to.be.withBody;\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{{request_body}}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{usersUrl}}/users/{{uid}}",
+									"host": [
+										"{{usersUrl}}"
+									],
+									"path": [
+										"users",
+										"{{uid}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Validation",
+					"item": [
+						{
+							"name": "Добавление нового пользователя без имени",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const main = async () => {\r",
+											"    const api = new API(pm);\r",
+											"    const rnd = new RandomUtils();\r",
+											"    console.log(\"Добавление нового пользователя:\");\r",
+											"\r",
+											"    let user;\r",
+											"    let company;\r",
+											"    try {\r",
+											"        user = await rnd.getUser();\r",
+											"        company = await api.addCompany(rnd.getCompany());\r",
+											"        pm.collectionVariables.set(\"cid\", company.id);\r",
+											"        user.companyId = company.id;\r",
+											"        user.firstName = \"\";\r",
+											"\r",
+											"    } catch(err) {\r",
+											"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+											"    }\r",
+											"\r",
+											"    pm.request.body.update({\r",
+											"        mode: 'raw',\r",
+											"        raw: JSON.stringify(user),\r",
+											"        options: { raw: { language: 'json' } }\r",
+											"    });\r",
+											"};\r",
+											"\r",
+											"const interval = setInterval(() => {}, 1000);\r",
+											"\r",
+											"setTimeout(async () => \r",
+											"    {\r",
+											"        try {\r",
+											"            await main();\r",
+											"        } catch (e) {\r",
+											"            console.error(e);\r",
+											"        } finally {\r",
+											"            clearInterval(interval);\r",
+											"        }\r",
+											"    },  \r",
+											"    100 \r",
+											");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"    pm.response.to.be.withBody;\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{{request_body}}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{usersUrl}}/users",
+									"host": [
+										"{{usersUrl}}"
+									],
+									"path": [
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Добавление нового пользователя без фамилии",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const main = async () => {\r",
+											"    const api = new API(pm);\r",
+											"    const rnd = new RandomUtils();\r",
+											"    console.log(\"Добавление нового пользователя:\");\r",
+											"\r",
+											"    let user;\r",
+											"    let company;\r",
+											"    try {\r",
+											"        user = await rnd.getUser();\r",
+											"        company = await api.addCompany(rnd.getCompany());\r",
+											"        pm.collectionVariables.set(\"cid\", company.id);\r",
+											"        user.companyId = company.id;\r",
+											"        user.lastName = \"\";\r",
+											"\r",
+											"    } catch(err) {\r",
+											"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+											"    }\r",
+											"\r",
+											"    pm.request.body.update({\r",
+											"        mode: 'raw',\r",
+											"        raw: JSON.stringify(user),\r",
+											"        options: { raw: { language: 'json' } }\r",
+											"    });\r",
+											"};\r",
+											"\r",
+											"const interval = setInterval(() => {}, 1000);\r",
+											"\r",
+											"setTimeout(async () => \r",
+											"    {\r",
+											"        try {\r",
+											"            await main();\r",
+											"        } catch (e) {\r",
+											"            console.error(e);\r",
+											"        } finally {\r",
+											"            clearInterval(interval);\r",
+											"        }\r",
+											"    },  \r",
+											"    100 \r",
+											");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"    pm.response.to.be.withBody;\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{{request_body}}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{usersUrl}}/users",
+									"host": [
+										"{{usersUrl}}"
+									],
+									"path": [
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Добавление нового пользователя без компании",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const main = async () => {\r",
+											"    const api = new API(pm);\r",
+											"    const rnd = new RandomUtils();\r",
+											"    console.log(\"Добавление нового пользователя:\");\r",
+											"\r",
+											"    let user;\r",
+											"    let company;\r",
+											"    try {\r",
+											"        user = await rnd.getUser();\r",
+											"        company = await api.addCompany(rnd.getCompany());\r",
+											"        pm.collectionVariables.set(\"cid\", company.id);\r",
+											"        user.companyId = \"\";\r",
+											"\r",
+											"    } catch(err) {\r",
+											"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+											"    }\r",
+											"\r",
+											"    pm.request.body.update({\r",
+											"        mode: 'raw',\r",
+											"        raw: JSON.stringify(user),\r",
+											"        options: { raw: { language: 'json' } }\r",
+											"    });\r",
+											"};\r",
+											"\r",
+											"const interval = setInterval(() => {}, 1000);\r",
+											"\r",
+											"setTimeout(async () => \r",
+											"    {\r",
+											"        try {\r",
+											"            await main();\r",
+											"        } catch (e) {\r",
+											"            console.error(e);\r",
+											"        } finally {\r",
+											"            clearInterval(interval);\r",
+											"        }\r",
+											"    },  \r",
+											"    100 \r",
+											");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"    pm.response.to.be.withBody;\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{{request_body}}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{usersUrl}}/users",
+									"host": [
+										"{{usersUrl}}"
+									],
+									"path": [
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Добавление нового пользователя без номера",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const main = async () => {\r",
+											"    const api = new API(pm);\r",
+											"    const rnd = new RandomUtils();\r",
+											"    console.log(\"Добавление нового пользователя:\");\r",
+											"\r",
+											"    let user;\r",
+											"    let company;\r",
+											"    try {\r",
+											"        user = await rnd.getUser();\r",
+											"        company = await api.addCompany(rnd.getCompany());\r",
+											"        pm.collectionVariables.set(\"cid\", company.id);\r",
+											"        user.companyId = company.id;\r",
+											"        user.phone = \"\";\r",
+											"\r",
+											"    } catch(err) {\r",
+											"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+											"    }\r",
+											"\r",
+											"    pm.request.body.update({\r",
+											"        mode: 'raw',\r",
+											"        raw: JSON.stringify(user),\r",
+											"        options: { raw: { language: 'json' } }\r",
+											"    });\r",
+											"};\r",
+											"\r",
+											"const interval = setInterval(() => {}, 1000);\r",
+											"\r",
+											"setTimeout(async () => \r",
+											"    {\r",
+											"        try {\r",
+											"            await main();\r",
+											"        } catch (e) {\r",
+											"            console.error(e);\r",
+											"        } finally {\r",
+											"            clearInterval(interval);\r",
+											"        }\r",
+											"    },  \r",
+											"    100 \r",
+											");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"    pm.response.to.be.withBody;\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{{request_body}}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{usersUrl}}/users",
+									"host": [
+										"{{usersUrl}}"
+									],
+									"path": [
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Добавление нового пользователя с именем длиннее 100 символов",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const main = async () => {\r",
+											"    const api = new API(pm);\r",
+											"    const rnd = new RandomUtils();\r",
+											"    console.log(\"Добавление нового пользователя:\");\r",
+											"\r",
+											"    let user;\r",
+											"    let company;\r",
+											"    try {\r",
+											"        user = await rnd.getUser();\r",
+											"        company = await api.addCompany(rnd.getCompany());\r",
+											"        pm.collectionVariables.set(\"cid\", company.id);\r",
+											"        user.companyId = company.id;\r",
+											"        user.firstName = rnd.getWord(101);\r",
+											"\r",
+											"    } catch(err) {\r",
+											"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+											"    }\r",
+											"\r",
+											"    pm.request.body.update({\r",
+											"        mode: 'raw',\r",
+											"        raw: JSON.stringify(user),\r",
+											"        options: { raw: { language: 'json' } }\r",
+											"    });\r",
+											"};\r",
+											"\r",
+											"const interval = setInterval(() => {}, 1000);\r",
+											"\r",
+											"setTimeout(async () => \r",
+											"    {\r",
+											"        try {\r",
+											"            await main();\r",
+											"        } catch (e) {\r",
+											"            console.error(e);\r",
+											"        } finally {\r",
+											"            clearInterval(interval);\r",
+											"        }\r",
+											"    },  \r",
+											"    100 \r",
+											");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"    pm.response.to.be.withBody;\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{{request_body}}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{usersUrl}}/users",
+									"host": [
+										"{{usersUrl}}"
+									],
+									"path": [
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Добавление нового пользователя с номером длиннее 50 символов",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const main = async () => {\r",
+											"    const api = new API(pm);\r",
+											"    const rnd = new RandomUtils();\r",
+											"    console.log(\"Добавление нового пользователя:\");\r",
+											"\r",
+											"    let user;\r",
+											"    let company;\r",
+											"    try {\r",
+											"        user = await rnd.getUser();\r",
+											"        company = await api.addCompany(rnd.getCompany());\r",
+											"        pm.collectionVariables.set(\"cid\", company.id);\r",
+											"        user.companyId = company.id;\r",
+											"        user.phone = rnd.getWord(51);\r",
+											"\r",
+											"    } catch(err) {\r",
+											"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+											"    }\r",
+											"\r",
+											"    pm.request.body.update({\r",
+											"        mode: 'raw',\r",
+											"        raw: JSON.stringify(user),\r",
+											"        options: { raw: { language: 'json' } }\r",
+											"    });\r",
+											"};\r",
+											"\r",
+											"const interval = setInterval(() => {}, 1000);\r",
+											"\r",
+											"setTimeout(async () => \r",
+											"    {\r",
+											"        try {\r",
+											"            await main();\r",
+											"        } catch (e) {\r",
+											"            console.error(e);\r",
+											"        } finally {\r",
+											"            clearInterval(interval);\r",
+											"        }\r",
+											"    },  \r",
+											"    100 \r",
+											");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"    pm.response.to.be.withBody;\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{{request_body}}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{usersUrl}}/users",
+									"host": [
+										"{{usersUrl}}"
+									],
+									"path": [
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Добавление нового пользователя с фамилией длиннее 250 символов",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const main = async () => {\r",
+											"    const api = new API(pm);\r",
+											"    const rnd = new RandomUtils();\r",
+											"    console.log(\"Добавление нового пользователя:\");\r",
+											"\r",
+											"    let user;\r",
+											"    let company;\r",
+											"    try {\r",
+											"        user = await rnd.getUser();\r",
+											"        company = await api.addCompany(rnd.getCompany());\r",
+											"        pm.collectionVariables.set(\"cid\", company.id);\r",
+											"        user.companyId = company.id;\r",
+											"        user.lastName = rnd.getWord(251);\r",
+											"\r",
+											"    } catch(err) {\r",
+											"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+											"    }\r",
+											"\r",
+											"    pm.request.body.update({\r",
+											"        mode: 'raw',\r",
+											"        raw: JSON.stringify(user),\r",
+											"        options: { raw: { language: 'json' } }\r",
+											"    });\r",
+											"};\r",
+											"\r",
+											"const interval = setInterval(() => {}, 1000);\r",
+											"\r",
+											"setTimeout(async () => \r",
+											"    {\r",
+											"        try {\r",
+											"            await main();\r",
+											"        } catch (e) {\r",
+											"            console.error(e);\r",
+											"        } finally {\r",
+											"            clearInterval(interval);\r",
+											"        }\r",
+											"    },  \r",
+											"    100 \r",
+											");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
 											"    pm.response.to.be.withBody;\r",
 											"    pm.response.to.be.json;\r",
 											"});"
@@ -455,7 +1252,7 @@
 									"const target = pm.response.json();\r",
 									"\r",
 									"pm.test(\"Должен вернуться список всех пользователей\", function () {\r",
-									"    pm.expect(target.length).to.eql(pm.collectionVariables.get(\"uid\"));\r",
+									"    pm.expect(target[target.length - 1].id).to.eql(pm.collectionVariables.get(\"uid\"));\r",
 									"});"
 								],
 								"type": "text/javascript",
@@ -623,6 +1420,128 @@
 					"response": []
 				},
 				{
+					"name": "Обновление пользователя",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const main = async () => {\r",
+									"    const api = new API(pm);\r",
+									"    const rnd = new RandomUtils();\r",
+									"    console.log(\"Добавление нового пользователя:\");\r",
+									"\r",
+									"    let user;\r",
+									"    let newUser;\r",
+									"    let company1;\r",
+									"    let company2;\r",
+									"    try {\r",
+									"        company1 = await api.addCompany(rnd.getCompany());\r",
+									"        pm.collectionVariables.set(\"cid\", company1.id);\r",
+									"\r",
+									"        user = await api.addUser(rnd.getUser());\r",
+									"        pm.collectionVariables.set(\"uid\", user.id)\r",
+									"\r",
+									"        company2 = await api.addCompany(rnd.getCompany());\r",
+									"        pm.collectionVariables.set(\"cid\", company2.id);\r",
+									"\r",
+									"        newUser = await rnd.getUser();\r",
+									"        newUser.firstName = \"NewName\";\r",
+									"        newUser.lastName = \"NewName\";\r",
+									"        newUser.phone = rnd.getWord(10);\r",
+									"        newUser.companyId = pm.collectionVariables.get(\"cid\")\r",
+									"\r",
+									"    } catch(err) {\r",
+									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+									"    }\r",
+									"\r",
+									"    pm.request.body.update({\r",
+									"        mode: 'raw',\r",
+									"        raw: JSON.stringify(newUser),\r",
+									"        options: { raw: { language: 'json' } }\r",
+									"    });\r",
+									"};\r",
+									"\r",
+									"const interval = setInterval(() => {}, 1000);\r",
+									"\r",
+									"setTimeout(async () => \r",
+									"    {\r",
+									"        try {\r",
+									"            await main();\r",
+									"        } catch (e) {\r",
+									"            console.error(e);\r",
+									"        } finally {\r",
+									"            clearInterval(interval);\r",
+									"        }\r",
+									"    },  \r",
+									"    100 \r",
+									");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.response.to.be.withBody;\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"const source = JSON.parse(pm.request.body.raw);\r",
+									"const target = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
+									"    pm.expect(target.id).to.not.be.null;\r",
+									"    pm.expect(source.firstName).equal(target.firstName, 'Имя пользователя должно соответствовать отправленному в запросе');\r",
+									"    pm.expect(source.lastName).equal(target.lastName, 'Фамилия пользователя должна соответствовать отправленной в запросе');\r",
+									"    pm.expect(source.phone).equal(target.phone, 'Телефон пользователя должен соответствовать отправленнму в запросе');\r",
+									"    pm.expect(source.companyId.toString()).equal(target.company.id.toString(), 'Компания пользователя должна соответствовать отправленной в запросе');\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{{request_body}}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{usersUrl}}/users/{{uid}}",
+							"host": [
+								"{{usersUrl}}"
+							],
+							"path": [
+								"users",
+								"{{uid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Удаление пользователя",
 					"event": [
 						{
@@ -633,25 +1552,27 @@
 									"    pm.response.to.have.status(204);\r",
 									"});\r",
 									"\r",
-									"const source = pm.collectionVariables.get('response');\r",
-									"const userId = pm.collectionVariables.get('uid');\r",
+									"const source = pm.collectionVariables.get(\"response\");\r",
+									"const userId = pm.collectionVariables.get(\"uid\");\r",
 									"\r",
 									"pm.test(\"Пользователь должен быть найден до выполнения запроса\", function(){\r",
-									"    pm.expect(source.length).to.eql(1);\r",
-									"    pm.expect(source[0].id).to.eql(userId);\r",
+									"    pm.expect(source).to.eql(userId);\r",
 									"});\r",
 									"\r",
 									"let body\r",
 									"const req = {\r",
-									"                url: \"http://localhost:8080/users/\" + pm.collectionVariables.get(\"uid\"),\r",
+									"                url: \"http://localhost:8080/users/\" + userId,\r",
 									"                method: \"GET\",\r",
 									"                body: body == null ? \"\" : JSON.stringify(body),\r",
 									"                header: { \"Content-Type\": \"application/json\" },\r",
 									"            };\r",
 									"\r",
 									"pm.sendRequest(req, (error, response) => {\r",
-									"    pm.test(\"Пользователь должен быть удалён после выполнения запроса\", function(){\r",
-									"        pm.expect(response.json().length).to.eql(0);\r",
+									"    pm.test(\"Пользователь не должен быть удалён после выполнения запроса\", function(){\r",
+									"        pm.expect(response).to.not.have.property('firstName');\r",
+									"        pm.expect(response).to.not.have.property('lastName');\r",
+									"        pm.expect(response).to.not.have.property('phone');\r",
+									"        pm.expect(response).to.not.have.property('company'); \r",
 									"    });\r",
 									"})"
 								],
@@ -672,7 +1593,7 @@
 									"        const user = await api.addUser(rnd.getUser());\r",
 									"        const foundedUser = await api.findUser(user.id);\r",
 									"        pm.collectionVariables.set(\"uid\", user.id);\r",
-									"        pm.collectionVariables.set(\"response\", foundedUser)\r",
+									"        pm.collectionVariables.set(\"response\", foundedUser.id);\r",
 									"    } catch(err) {\r",
 									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
 									"    }\r",
@@ -829,7 +1750,12 @@
 								}
 							},
 							"response": []
-						},
+						}
+					]
+				},
+				{
+					"name": "Validation",
+					"item": [
 						{
 							"name": "Добавление новой компании без названия",
 							"event": [
@@ -927,7 +1853,7 @@
 							"response": []
 						},
 						{
-							"name": "Добавление новой компании без названия",
+							"name": "Добавление новой компании с названием длиннее 250 символов",
 							"event": [
 								{
 									"listen": "prerequest",
@@ -943,7 +1869,7 @@
 											"        const company1 = await api.addCompany(rnd.getCompany());\r",
 											"        pm.collectionVariables.set(\"cid\", company1.id)\r",
 											"        company2 = rnd.getCompany();\r",
-											"        company2.name = \"\";\r",
+											"        company2.name = rnd.getWord(251);\r",
 											"    } catch(err) {\r",
 											"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
 											"    }\r",
@@ -1186,7 +2112,7 @@
 									"const target = pm.response.json();\r",
 									"\r",
 									"pm.test(\"Должен вернуться список всех компаний\", function () {\r",
-									"    pm.expect(target.length).to.eql(pm.collectionVariables.get(\"cid\"));\r",
+									"    pm.expect(target[target.length - 1].id).to.eql(pm.collectionVariables.get(\"cid\"));\r",
 									"});"
 								],
 								"type": "text/javascript",
@@ -1342,6 +2268,114 @@
 					"response": []
 				},
 				{
+					"name": "Обновление компании",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const main = async () => {\r",
+									"    const api = new API(pm);\r",
+									"    const rnd = new RandomUtils();\r",
+									"\r",
+									"    let newCompany;\r",
+									"    try {\r",
+									"        const company = await api.addCompany(rnd.getCompany());\r",
+									"        pm.collectionVariables.set(\"cid\", company.id)\r",
+									"        newCompany = await rnd.getCompany();\r",
+									"        newCompany.name = rnd.getWord(10);\r",
+									"        pm.collectionVariables.set(\"rndCompName\", newCompany.name);\r",
+									"        newCompany.budget = 100\r",
+									"\r",
+									"    } catch(err) {\r",
+									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+									"    }\r",
+									"\r",
+									"    pm.request.body.update({\r",
+									"        mode: 'raw',\r",
+									"        raw: JSON.stringify(newCompany),\r",
+									"        options: { raw: { language: 'json' } }\r",
+									"    });\r",
+									"};\r",
+									"\r",
+									"const interval = setInterval(() => {}, 1000);\r",
+									"\r",
+									"setTimeout(async () => \r",
+									"    {\r",
+									"        try {\r",
+									"            await main();\r",
+									"        } catch (e) {\r",
+									"            console.error(e);\r",
+									"        } finally {\r",
+									"            clearInterval(interval);\r",
+									"        }\r",
+									"    },  \r",
+									"    100 \r",
+									");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.response.to.be.withBody;\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"const source = JSON.parse(pm.request.body.raw);\r",
+									"const target = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
+									"    pm.expect(target.id).to.not.be.null;\r",
+									"    pm.expect(source.name).equal(target.name, 'Название компании должно соответствовать отправленному в запросе');\r",
+									"    pm.expect(source.budget.toString()).equal(target.budget.toString(), 'Бюджет компании должен соответствовать отправленному в запросе');\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{{request_body}}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{companiesUrl}}/companies/{{cid}}",
+							"host": [
+								"{{companiesUrl}}"
+							],
+							"path": [
+								"companies",
+								"{{cid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Удаление компании",
 					"event": [
 						{
@@ -1352,26 +2386,27 @@
 									"    pm.response.to.have.status(204);\r",
 									"});\r",
 									"\r",
-									"//const source = pm.collectionVariables.get('response');\r",
+									"const source = pm.collectionVariables.get(\"response\");\r",
 									"const companyId = pm.collectionVariables.get(\"cid\");\r",
 									"\r",
-									"//pm.test(\"Пользователь должен быть найден до выполнения запроса\", function(){\r",
-									"//    pm.expect(source.length).to.eql(1);\r",
-									"//    pm.expect(source[0].id).to.eql(userId);\r",
-									"//});\r",
+									"pm.test(\"Компания должна быть найдена до выполнения запроса\", function(){\r",
+									"    pm.expect(source).to.eql(companyId);\r",
+									"});\r",
 									"\r",
 									"let body\r",
 									"const req = {\r",
-									"                url: \"http://localhost:8080/companies/\" + pm.collectionVariables.get(\"cid\"),\r",
+									"                url: \"http://localhost:8080/companies/\" + companyId,\r",
 									"                method: \"GET\",\r",
 									"                body: body == null ? \"\" : JSON.stringify(body),\r",
 									"                header: { \"Content-Type\": \"application/json\" },\r",
 									"            };\r",
-									"//pm.sendRequest(req, (error, response) => {\r",
-									"//    pm.test(\"Пользователь должен быть удалён после выполнения запроса\", function(){\r",
-									"//        pm.expect(response.json().length).to.eql(0);\r",
-									"//    });\r",
-									"//})"
+									"\r",
+									"pm.sendRequest(req, (error, response) => {\r",
+									"    pm.test(\"Компания не должна быть найдена после выполнения запроса\", function(){\r",
+									"        pm.expect(response).to.not.have.property('name');\r",
+									"        pm.expect(response).to.not.have.property('budget');\r",
+									"    });\r",
+									"})"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -1389,7 +2424,7 @@
 									"        const company = await api.addCompany(rnd.getCompany());\r",
 									"        const foundedCompany = await api.findCompany(company.id);\r",
 									"        pm.collectionVariables.set(\"cid\", company.id);\r",
-									"        pm.collectionVariables.set(\"response\", foundedCompany)\r",
+									"        pm.collectionVariables.set(\"response\", foundedCompany.id)\r",
 									"    } catch(err) {\r",
 									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
 									"    }\r",
@@ -1462,7 +2497,7 @@
 					"    }",
 					"",
 					"    async addCompany(company, verbose=null) {",
-					"        return this.post(\"/companies\", company, \"Ошибка при добавлении новой компании: \", verbose, \"http://localhost:9090\");",
+					"        return this.post(\"/companies\", company, \"Ошибка при добавлении новой компании: \", verbose, \"http://localhost:8080\");",
 					"    }",
 					"",
 					"    async findUser(userId, verbose=null) {",
@@ -1470,7 +2505,7 @@
 					"    }",
 					"",
 					"    async findCompany(companyId, verbose=null) {",
-					"    return this.get('/companies/' + companyId, null, \"Ошибка при поиске компании по id\", verbose, \"http://localhost:9090\");",
+					"    return this.get('/companies/' + companyId, null, \"Ошибка при поиске компании по id\", verbose, \"http://localhost:8080\");",
 					"    }",
 					"",
 					"    async post(path, body, errorText = \"Ошибка при выполнении post-запроса: \", verbose=null, baseUrl) {",
@@ -1612,10 +2647,6 @@
 			"value": ""
 		},
 		{
-			"key": "response",
-			"value": ""
-		},
-		{
 			"key": "uid",
 			"value": 1,
 			"type": "number"
@@ -1689,7 +2720,7 @@
 		},
 		{
 			"key": "companiesUrl",
-			"value": "http://localhost:9090",
+			"value": "http://localhost:8080",
 			"type": "string"
 		},
 		{
@@ -1701,6 +2732,15 @@
 			"key": "unknownUID",
 			"value": "0",
 			"type": "string"
+		},
+		{
+			"key": "response",
+			"value": "0",
+			"type": "string"
+		},
+		{
+			"key": "rndCompName",
+			"value": ""
 		}
 	]
 }

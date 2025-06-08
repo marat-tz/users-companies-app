@@ -1,0 +1,13 @@
+logging:
+  level:
+    org.springframework.cloud.netflix.eureka: DEBUG
+
+server:
+  port: 8761
+
+eureka:
+  instance:
+    hostname: eureka-server # eureka-server
+  client:
+    register-with-eureka: false  # Сервер не регистрирует себя
+    fetch-registry: true        # Сервер получает список сервисов

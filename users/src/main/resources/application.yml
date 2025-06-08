@@ -10,18 +10,13 @@ logging:
           jpa.JpaTransactionManager: DEBUG
         transaction: INFO
         transaction.interceptor: TRACE
-#    apache:
-#      http: DEBUG
-#    httpclient:
-#      wire: DEBUG
 
 server:
-  port: 8080
-
-companies:
-  url: http://companies:9090
+  port: 9090
 
 spring:
+  application:
+    name: users
   jpa:
     hibernate:
       ddl-auto: none
@@ -42,3 +37,10 @@ spring:
 #    url: jdbc:postgresql://localhost:5432/users-companies
 #    username: postgres
 #    password: admin
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka  # eureka-server
+    register-with-eureka: true  # Регистрация включена (по умолчанию true)
+    fetch-registry: true        # Получение списка сервисов (по умолчанию true)
