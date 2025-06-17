@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
@@ -31,30 +33,35 @@ public class UsersController {
 
     @GetMapping("/{userId}")
     public UserDtoResponse findUserById(@PathVariable Long userId) {
+        log.info("Получение пользователя с id = {}", userId);
         return userService.findUserById(userId);
     }
 
     @PatchMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public UserDtoResponse updateUserById(@RequestBody UserDtoRequest dto, @PathVariable Long userId) {
+        log.info("Обновление пользователя с id = {}, содержимое входящего DTO = {}", userId, dto);
         return userService.updateUserById(dto, userId);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserDtoResponse createUser(@Valid @RequestBody UserDtoRequest dto) {
+        log.info("Создание нового пользователя, содержимое входящего DTO = {}", dto);
         return userService.createUser(dto);
     }
 
     @DeleteMapping("/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable Long userId) {
+        log.info("Удаление пользователя с id = {}", userId);
         userService.deleteUser(userId);
     }
 
     @GetMapping
     public List<UserDtoResponse> findUsers(@RequestParam(required = false) List<Long> companyId) {
+        log.info("Получение списка всех пользователей с companyId = {}" +
+                " (при отсутствии companyId - получение всех пользователей", companyId);
         return userService.findUsers(companyId);
     }
-
 }
