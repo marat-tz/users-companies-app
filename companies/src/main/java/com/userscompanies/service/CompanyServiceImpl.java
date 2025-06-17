@@ -35,24 +35,24 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public CompanyDtoShortResponse createCompany(CompanyDtoRequest dto) {
-        log.info("Создание компании");
         if (companyRepository.existsByName(dto.getName())) {
             throw new ConflictException("Компания с указанным названием уже существует");
         }
 
         Company company = companyRepository.save(companyMapper.toEntity(dto));
-        return companyMapper.toShortDto(company);
+        CompanyDtoShortResponse result = companyMapper.toShortDto(company);
+        log.info("Создана компания {}", result);
+        return result;
     }
 
     @Override
     public void deleteCompany(Long companyId) {
-        log.info("Удаление компании");
         companyRepository.deleteById(companyId);
+        log.info("Удалена компания с id = {}", companyId);
     }
 
     @Override
     public List<CompanyDtoFullResponse> findCompanies() {
-        log.info("Получение всех компаний");
         List<Company> companies = companyRepository.findAll();
 
         List<Long> companiesIds = companies
@@ -64,29 +64,35 @@ public class CompanyServiceImpl implements CompanyService {
         Map<Long, List<UserDtoResponse>> userMap = users.stream()
                 .collect(Collectors.groupingBy(user -> user.getCompany().getId()));
 
-        return companies.stream()
+        List<CompanyDtoFullResponse> result = companies.stream()
                 .map(company -> companyMapper.toDto(company, userMap.get(company.getId())))
                 .toList();
+
+        log.info("Получен список всех компаний в количестве: {}", result.size());
+        return result;
     }
 
     @Override
     public CompanyDtoFullResponse findCompanyById(Long companyId) {
-        log.info("Поиск компании по id");
-
         Company company = companyRepository.findById(companyId).orElseThrow(() ->
                 new NotFoundException("Компания " + companyId + " не существует"));
 
         List<UserDtoResponse> users = usersClient.findUsersByCompanyIds(List.of(companyId));
+        CompanyDtoFullResponse result = companyMapper.toDto(company, users);
 
-        return companyMapper.toDto(company, users);
+        log.info("Найдена компания с id = {}, DTO: {}", companyId, result);
+        return result;
     }
 
     @Override
     public List<CompanyDtoShortResponse> findCompaniesByIds(List<Long> ids) {
         List<Company> companies = companyRepository.findAllById(ids);
-        return companies.stream()
+        List<CompanyDtoShortResponse> result = companies.stream()
                 .map(companyMapper::toShortDto)
                 .toList();
+
+        log.info("Найдены компании с id = {}, в количестве: {}", ids, result.size());
+        return result;
     }
 
     @Override
@@ -103,7 +109,9 @@ public class CompanyServiceImpl implements CompanyService {
             company.setBudget(dto.getBudget());
         }
 
-        Company result = companyRepository.save(company);
-        return companyMapper.toShortDto(result);
+        Company savedCompany = companyRepository.save(company);
+        CompanyDtoShortResponse result = companyMapper.toShortDto(savedCompany);
+        log.info("Обновлена компания, возвращаемый DTO: {}", result);
+        return result;
     }
 }
