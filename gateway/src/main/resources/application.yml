@@ -1,0 +1,33 @@
+logging:
+  level:
+    # Основные логи Gateway
+    org.springframework.cloud.gateway: TRACE  # Максимальная детализация
+    org.springframework.web.reactive: DEBUG   # Логи HTTP-запросов
+    reactor.netty.http: DEBUG                # Логи Netty (транспортный уровень)
+
+    # Для LoadBalancer (если используется lb://)
+    org.springframework.cloud.loadbalancer: DEBUG
+
+    org.springframework.http.server.reactive: DEBUG
+    org.springframework.boot.autoconfigure.web: DEBUG
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      routes:
+        - id: companies
+          uri: lb://companies
+          predicates:
+            - Path=/companies/**
+
+        - id: users
+          uri: lb://users
+          predicates:
+            - Path=/users/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka # eureka-server

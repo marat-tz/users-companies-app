@@ -36,8 +36,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDtoResponse createUser(UserDtoRequest dto) {
-        log.info("Создание пользователя");
-
         if (userRepository.existsByPhone(dto.getPhone())) {
             throw new ConflictException("Пользователь с указанным номером уже существует");
         }
@@ -47,18 +45,20 @@ public class UserServiceImpl implements UserService {
         CompanyDtoShortResponse companyDtoShort = companyMapper.toShortDto(response.getBody());
 
         User user = userRepository.save(userMapper.toEntity(dto));
-        return userMapper.toDto(user, companyDtoShort);
+        UserDtoResponse result = userMapper.toDto(user, companyDtoShort);
+
+        log.info("Создан пользователь: {}", result);
+        return result;
     }
 
     @Override
     public void deleteUser(Long userId) {
-        log.info("Удаление пользователя");
         userRepository.deleteById(userId);
+        log.info("Удалён пользователь с id = {}", userId);
     }
 
     @Override
     public List<UserDtoResponse> findUsers(List<Long> companyId) {
-        log.info("Получение всех пользователей");
         List<User> users;
 
         if (companyId == null) {
@@ -81,30 +81,33 @@ public class UserServiceImpl implements UserService {
         Map<Long, CompanyDtoShortResponse> companyMap = companiesDto.stream()
                 .collect(Collectors.toMap(CompanyDtoShortResponse::getId, dto -> dto));
 
-        return users.stream()
+        List<UserDtoResponse> result = users.stream()
                 .map(user -> userMapper.toDto(user, companyMap.get(user.getCompanyId())))
                 .toList();
+
+        log.info("Получен список пользователей в количестве {}", result.size());
+        return result;
     }
 
     @Override
     public UserDtoResponse findUserById(Long userId) {
-        log.info("Получение пользователя по id");
-
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь " + userId + " не существует"));
 
         ResponseEntity<Company> response = getCompanyById(user.getCompanyId());
+        UserDtoResponse result = userMapper.toDto(user, companyMapper.toShortDto(response.getBody()));
 
-        return userMapper.toDto(user, companyMapper.toShortDto(response.getBody()));
+        log.info("Найден пользователь с id = {}, возвращаемый DTO: {}", userId, result);
+        return result;
     }
 
     @Override
     public UserDtoResponse updateUserById(UserDtoRequest dto, Long userId) {
-
-        CompanyDtoShortResponse companyDto = null;
-
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь " + userId + " не существует"));
+
+        ResponseEntity<Company> response = getCompanyById(dto.getCompanyId());
+        CompanyDtoShortResponse companyDto = companyMapper.toShortDto(response.getBody());
 
         if (dto.getFirstName() != null && !dto.getFirstName().isBlank()) {
             user.setFirstName(dto.getFirstName());
@@ -118,18 +121,11 @@ public class UserServiceImpl implements UserService {
             user.setPhone(dto.getPhone());
         }
 
-        if (dto.getCompanyId() != null && dto.getCompanyId() > 0) {
-            ResponseEntity<Company> response = getCompanyById(dto.getCompanyId());
-            if (response.getStatusCode().is2xxSuccessful()) {
-                user.setCompanyId(dto.getCompanyId());
-                companyDto = companyMapper.toShortDto(response.getBody());
-            } else {
-                throw new NotFoundException("Ошибка при попытке обновить компанию пользователя");
-            }
-        }
+        User savedUser = userRepository.save(user);
+        UserDtoResponse result = userMapper.toDto(savedUser, companyDto);
 
-        User result = userRepository.save(user);
-        return userMapper.toDto(result, companyDto);
+        log.info("Обновлён пользователь с id = {}, возвращаемый DTO: {}", userId, result);
+        return result;
     }
 
     private ResponseEntity<Company> getCompanyById(Long companyId) {
