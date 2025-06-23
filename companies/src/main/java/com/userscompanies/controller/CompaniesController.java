@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,9 +40,10 @@ public class CompaniesController {
     }
 
     @GetMapping
-    public List<CompanyDtoFullResponse> findCompanies() {
+    public Page<CompanyDtoFullResponse> findCompanies(@RequestParam(defaultValue = "0") Integer from,
+                                                      @RequestParam(defaultValue = "10") Integer size) {
         log.info("Получение списка всех компаний");
-        return companyService.findCompanies();
+        return companyService.findCompanies(from, size);
     }
 
     @GetMapping("/ids")

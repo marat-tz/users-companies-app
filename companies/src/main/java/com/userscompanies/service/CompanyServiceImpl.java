@@ -16,6 +16,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -53,10 +56,11 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public List<CompanyDtoFullResponse> findCompanies() {
-        List<Company> companies = companyRepository.findAll();
+    public Page<CompanyDtoFullResponse> findCompanies(Integer from, Integer size) {
+        Pageable pageable = PageRequest.of(from / size, size);
+        Page<Company> companies = companyRepository.findAll(pageable);
 
-        List<Long> companiesIds = companies
+        List<Long> companiesIds = companies.getContent()
                 .stream()
                 .map(Company::getId)
                 .toList();
@@ -65,12 +69,19 @@ public class CompanyServiceImpl implements CompanyService {
         Map<Long, List<UserDtoResponse>> userMap = users.getContent().stream()
                 .collect(Collectors.groupingBy(user -> user.getCompany().getId()));
 
-        List<CompanyDtoFullResponse> result = companies.stream()
+        List<CompanyDtoFullResponse> result = companies.getContent()
+                .stream()
                 .map(company -> companyMapper.toDto(company, userMap.get(company.getId())))
                 .toList();
 
+        Page<CompanyDtoFullResponse> pageResult = new PageImpl<>(
+                result,
+                companies.getPageable(),
+                companies.getTotalElements()
+        );
+
         log.info("Получен список всех компаний в количестве: {}", result.size());
-        return result;
+        return pageResult;
     }
 
     @Override
