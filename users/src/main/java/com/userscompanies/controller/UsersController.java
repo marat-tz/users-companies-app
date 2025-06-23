@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,9 +60,11 @@ public class UsersController {
     }
 
     @GetMapping
-    public List<UserDtoResponse> findUsers(@RequestParam(required = false) List<Long> companyId) {
+    public Page<UserDtoResponse> findUsers(@RequestParam(required = false) List<Long> companyId,
+                                           @RequestParam(defaultValue = "0") Integer from,
+                                           @RequestParam(defaultValue = "10") Integer size) {
         log.info("Получение списка всех пользователей с companyId = {}" +
                 " (при отсутствии companyId - получение всех пользователей", companyId);
-        return userService.findUsers(companyId);
+        return userService.findUsers(companyId, from, size);
     }
 }

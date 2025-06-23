@@ -16,6 +16,10 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -58,16 +62,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDtoResponse> findUsers(List<Long> companyId) {
-        List<User> users;
+    public Page<UserDtoResponse> findUsers(List<Long> companyId, Integer from, Integer size) {
+        Page<User> usersPage;
+        Pageable pageable = PageRequest.of(from / size, size);
 
         if (companyId == null) {
-            users = userRepository.findAll();
+            usersPage = userRepository.findAll(pageable);
         } else {
-            users = userRepository.findAllByCompanyIdIn(companyId);
+            usersPage = userRepository.findAllByCompanyIdIn(pageable, companyId);
         }
 
-        List<Long> companiesIds = users
+        List<Long> companiesIds = usersPage.getContent()
                 .stream()
                 .map(User::getCompanyId)
                 .toList();
@@ -81,12 +86,18 @@ public class UserServiceImpl implements UserService {
         Map<Long, CompanyDtoShortResponse> companyMap = companiesDto.stream()
                 .collect(Collectors.toMap(CompanyDtoShortResponse::getId, dto -> dto));
 
-        List<UserDtoResponse> result = users.stream()
+        List<UserDtoResponse> result = usersPage.getContent().stream()
                 .map(user -> userMapper.toDto(user, companyMap.get(user.getCompanyId())))
                 .toList();
 
+        Page<UserDtoResponse> pageResult = new PageImpl<>(
+                result,
+                usersPage.getPageable(),
+                usersPage.getTotalElements()
+        );
+
         log.info("Получен список пользователей в количестве {}", result.size());
-        return result;
+        return pageResult;
     }
 
     @Override

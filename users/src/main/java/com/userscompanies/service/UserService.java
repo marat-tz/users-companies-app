@@ -2,6 +2,7 @@ package com.userscompanies.service;
 
 import com.userscompanies.dto.UserDtoRequest;
 import com.userscompanies.dto.UserDtoResponse;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -12,7 +13,7 @@ public interface UserService {
 
     void deleteUser(Long userId);
 
-    List<UserDtoResponse> findUsers(List<Long> companyId);
+    Page<UserDtoResponse> findUsers(List<Long> companyId, Integer from, Integer size);
 
     UserDtoResponse findUserById(Long userId);
 

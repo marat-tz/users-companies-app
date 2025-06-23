@@ -15,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -60,8 +61,8 @@ public class CompanyServiceImpl implements CompanyService {
                 .map(Company::getId)
                 .toList();
 
-        List<UserDtoResponse> users = usersClient.findUsersByCompanyIds(companiesIds);
-        Map<Long, List<UserDtoResponse>> userMap = users.stream()
+        Page<UserDtoResponse> users = usersClient.findUsersByCompanyIds(companiesIds);
+        Map<Long, List<UserDtoResponse>> userMap = users.getContent().stream()
                 .collect(Collectors.groupingBy(user -> user.getCompany().getId()));
 
         List<CompanyDtoFullResponse> result = companies.stream()
@@ -77,8 +78,8 @@ public class CompanyServiceImpl implements CompanyService {
         Company company = companyRepository.findById(companyId).orElseThrow(() ->
                 new NotFoundException("Компания " + companyId + " не существует"));
 
-        List<UserDtoResponse> users = usersClient.findUsersByCompanyIds(List.of(companyId));
-        CompanyDtoFullResponse result = companyMapper.toDto(company, users);
+        Page<UserDtoResponse> users = usersClient.findUsersByCompanyIds(List.of(companyId));
+        CompanyDtoFullResponse result = companyMapper.toDto(company, users.getContent());
 
         log.info("Найдена компания с id = {}, DTO: {}", companyId, result);
         return result;

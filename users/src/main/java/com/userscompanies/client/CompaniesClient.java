@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.Optional;
 
-@FeignClient(name = "companies")
+@FeignClient(name = "companies", url = "http://localhost:9091")
 public interface CompaniesClient {
     @GetMapping("/companies/{companyId}")
     ResponseEntity<Company> findCompany(@PathVariable Long companyId);
