@@ -2,6 +2,7 @@ package com.userscompanies.client;
 
 import com.userscompanies.model.Company;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,5 +17,5 @@ public interface CompaniesClient {
     ResponseEntity<Company> findCompany(@PathVariable Long companyId);
 
     @GetMapping("/companies/ids")
-    List<Company> findCompaniesByIds(@RequestParam(required = false) List<Long> ids);
+    Page<Company> findCompaniesByIds(@RequestParam(required = false) List<Long> ids);
 }

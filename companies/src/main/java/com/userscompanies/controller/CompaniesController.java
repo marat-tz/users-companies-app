@@ -47,9 +47,11 @@ public class CompaniesController {
     }
 
     @GetMapping("/ids")
-    public List<CompanyDtoShortResponse> findCompaniesByIds(@RequestParam(required = false) List<Long> ids) {
+    public Page<CompanyDtoShortResponse> findCompaniesByIds(@RequestParam(required = false) List<Long> ids,
+                                                            @RequestParam(defaultValue = "0") Integer from,
+                                                            @RequestParam(defaultValue = "10") Integer size) {
         log.info("Получение компаний по списку id = {}", ids);
-        return companyService.findCompaniesByIds(ids);
+        return companyService.findCompaniesByIds(ids, from, size);
     }
 
     @PatchMapping("/{companyId}")

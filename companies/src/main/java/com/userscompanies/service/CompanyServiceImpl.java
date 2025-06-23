@@ -66,7 +66,8 @@ public class CompanyServiceImpl implements CompanyService {
                 .toList();
 
         Page<UserDtoResponse> users = usersClient.findUsersByCompanyIds(companiesIds);
-        Map<Long, List<UserDtoResponse>> userMap = users.getContent().stream()
+        Map<Long, List<UserDtoResponse>> userMap = users.getContent()
+                .stream()
                 .collect(Collectors.groupingBy(user -> user.getCompany().getId()));
 
         List<CompanyDtoFullResponse> result = companies.getContent()
@@ -97,14 +98,23 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public List<CompanyDtoShortResponse> findCompaniesByIds(List<Long> ids) {
-        List<Company> companies = companyRepository.findAllById(ids);
-        List<CompanyDtoShortResponse> result = companies.stream()
+    public Page<CompanyDtoShortResponse> findCompaniesByIds(List<Long> ids, Integer from, Integer size) {
+        Pageable pageable = PageRequest.of(from / size, size);
+        Page<Company> companies = companyRepository.findAllByIdIn(pageable, ids);
+
+        List<CompanyDtoShortResponse> result = companies.getContent()
+                .stream()
                 .map(companyMapper::toShortDto)
                 .toList();
 
+        Page<CompanyDtoShortResponse> pageResult = new PageImpl<>(
+                result,
+                companies.getPageable(),
+                companies.getTotalElements()
+        );
+
         log.info("Найдены компании с id = {}, в количестве: {}", ids, result.size());
-        return result;
+        return pageResult;
     }
 
     @Override

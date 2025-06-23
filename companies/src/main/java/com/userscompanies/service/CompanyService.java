@@ -17,7 +17,7 @@ public interface CompanyService {
 
     CompanyDtoFullResponse findCompanyById(Long userId);
 
-    List<CompanyDtoShortResponse> findCompaniesByIds(List<Long> ids);
+    Page<CompanyDtoShortResponse> findCompaniesByIds(List<Long> ids, Integer from, Integer size);
 
     CompanyDtoShortResponse updateCompanyById(CompanyDtoRequest dto, Long companyId);
 }

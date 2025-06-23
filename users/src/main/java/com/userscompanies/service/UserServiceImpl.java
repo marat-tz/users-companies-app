@@ -77,8 +77,8 @@ public class UserServiceImpl implements UserService {
                 .map(User::getCompanyId)
                 .toList();
 
-        List<Company> companies = companiesClient.findCompaniesByIds(companiesIds);
-        List<CompanyDtoShortResponse> companiesDto = companies
+        Page<Company> companies = companiesClient.findCompaniesByIds(companiesIds);
+        List<CompanyDtoShortResponse> companiesDto = companies.getContent()
                 .stream()
                 .map(companyMapper::toShortDto)
                 .toList();
