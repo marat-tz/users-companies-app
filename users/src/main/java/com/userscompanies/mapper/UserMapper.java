@@ -1,5 +1,6 @@
 package com.userscompanies.mapper;
 
+import com.userscompanies.dto.CompanyDtoFullResponse;
 import com.userscompanies.dto.CompanyDtoShortResponse;
 import com.userscompanies.dto.UserDtoRequest;
 import com.userscompanies.dto.UserDtoResponse;
