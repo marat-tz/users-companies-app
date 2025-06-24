@@ -31,18 +31,13 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CompanyServiceImpl implements CompanyService {
 
-    private final UserMapper userMapper;
-
     final CompanyRepository companyRepository;
     final CompanyMapper companyMapper;
     final UsersClient usersClient;
 
     @Override
     public CompanyDtoShortResponse createCompany(CompanyDtoRequest dto) {
-        if (companyRepository.existsByName(dto.getName())) {
-            throw new ConflictException("Компания с указанным названием уже существует");
-        }
-
+        checkCompanyExistsByName(dto.getName());
         Company company = companyRepository.save(companyMapper.toEntity(dto));
         CompanyDtoShortResponse result = companyMapper.toShortDto(company);
         log.info("Создана компания {}", result);
@@ -87,8 +82,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public CompanyDtoFullResponse findCompanyById(Long companyId) {
-        Company company = companyRepository.findById(companyId).orElseThrow(() ->
-                new NotFoundException("Компания " + companyId + " не существует"));
+        Company company = getCompanyById(companyId);
 
         Page<UserDtoResponse> users = usersClient.findUsersByCompanyIds(List.of(companyId));
         CompanyDtoFullResponse result = companyMapper.toDto(company, users.getContent());
@@ -120,8 +114,7 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public CompanyDtoShortResponse updateCompanyById(CompanyDtoRequest dto, Long companyId) {
 
-        Company company = companyRepository.findById(companyId).orElseThrow(() ->
-                new NotFoundException("Компания " + companyId + " не существует"));
+        Company company = getCompanyById(companyId);
 
         if (dto.getName() != null && !dto.getName().isBlank()) {
             company.setName(dto.getName());
@@ -135,5 +128,16 @@ public class CompanyServiceImpl implements CompanyService {
         CompanyDtoShortResponse result = companyMapper.toShortDto(savedCompany);
         log.info("Обновлена компания, возвращаемый DTO: {}", result);
         return result;
+    }
+
+    private void checkCompanyExistsByName(String name) {
+        if (companyRepository.existsByName(name)) {
+            throw new ConflictException("Компания с указанным названием уже существует");
+        }
+    }
+
+    private Company getCompanyById(Long id) {
+        return companyRepository.findById(id).orElseThrow(() ->
+                new NotFoundException("Компания " + id + " не существует"));
     }
 }

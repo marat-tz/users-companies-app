@@ -40,12 +40,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDtoResponse createUser(UserDtoRequest dto) {
-        if (userRepository.existsByPhone(dto.getPhone())) {
-            throw new ConflictException("Пользователь с указанным номером уже существует");
-        }
+        checkUserExistsByPhone(dto.getPhone());
 
         ResponseEntity<Company> response = getCompanyById(dto.getCompanyId());
-
         CompanyDtoShortResponse companyDtoShort = companyMapper.toShortDto(response.getBody());
 
         User user = userRepository.save(userMapper.toEntity(dto));
@@ -102,8 +99,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDtoResponse findUserById(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException("Пользователь " + userId + " не существует"));
+        User user = getUserById(userId);
 
         ResponseEntity<Company> response = getCompanyById(user.getCompanyId());
         UserDtoResponse result = userMapper.toDto(user, companyMapper.toShortDto(response.getBody()));
@@ -114,8 +110,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDtoResponse updateUserById(UserDtoRequest dto, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException("Пользователь " + userId + " не существует"));
+        User user = getUserById(userId);
 
         ResponseEntity<Company> response = getCompanyById(dto.getCompanyId());
         CompanyDtoShortResponse companyDto = companyMapper.toShortDto(response.getBody());
@@ -145,5 +140,16 @@ public class UserServiceImpl implements UserService {
         } catch (FeignException.NotFound e) {
             throw new NotFoundException("Компания " + companyId + " не найдена");
         }
+    }
+
+    private void checkUserExistsByPhone(String phone) {
+        if (userRepository.existsByPhone(phone)) {
+            throw new ConflictException("Пользователь с указанным номером уже существует");
+        }
+    }
+
+    private User getUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(() ->
+                new NotFoundException("Пользователь " + id + " не существует"));
     }
 }
