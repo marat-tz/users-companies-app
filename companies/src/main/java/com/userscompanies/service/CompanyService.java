@@ -3,6 +3,7 @@ package com.userscompanies.service;
 import com.userscompanies.dto.CompanyDtoFullResponse;
 import com.userscompanies.dto.CompanyDtoRequest;
 import com.userscompanies.dto.CompanyDtoShortResponse;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -11,11 +12,13 @@ public interface CompanyService {
 
     void deleteCompany(Long companyId);
 
-    List<CompanyDtoFullResponse> findCompanies();
+    Page<CompanyDtoFullResponse> findCompanies(Integer from, Integer size);
+
+    CompanyDtoShortResponse findCompanyByIdShort(Long companyId);
 
     CompanyDtoFullResponse findCompanyById(Long userId);
 
-    List<CompanyDtoShortResponse> findCompaniesByIds(List<Long> ids);
+    Page<CompanyDtoShortResponse> findCompaniesByIds(List<Long> ids, Integer from, Integer size);
 
     CompanyDtoShortResponse updateCompanyById(CompanyDtoRequest dto, Long companyId);
 }

@@ -8,6 +8,7 @@ server:
 eureka:
   instance:
     hostname: eureka-server # eureka-server
+#    hostname: localhost # eureka-server
   client:
     register-with-eureka: false  # Сервер не регистрирует себя
     fetch-registry: true        # Сервер получает список сервисов

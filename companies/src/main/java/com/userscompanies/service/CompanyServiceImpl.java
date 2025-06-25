@@ -8,17 +8,21 @@ import com.userscompanies.dto.UserDtoResponse;
 import com.userscompanies.exception.ConflictException;
 import com.userscompanies.exception.NotFoundException;
 import com.userscompanies.mapper.CompanyMapper;
-import com.userscompanies.mapper.UserMapper;
 import com.userscompanies.model.Company;
 import com.userscompanies.repository.CompanyRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,83 +31,121 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CompanyServiceImpl implements CompanyService {
 
-    private final UserMapper userMapper;
-
     final CompanyRepository companyRepository;
     final CompanyMapper companyMapper;
     final UsersClient usersClient;
 
     @Override
     public CompanyDtoShortResponse createCompany(CompanyDtoRequest dto) {
-        log.info("Создание компании");
-        if (companyRepository.existsByName(dto.getName())) {
-            throw new ConflictException("Компания с указанным названием уже существует");
-        }
-
+        checkCompanyExistsByName(dto.getName());
         Company company = companyRepository.save(companyMapper.toEntity(dto));
-        return companyMapper.toShortDto(company);
+        CompanyDtoShortResponse result = companyMapper.toShortDto(company);
+        log.info("Создана компания {}", result);
+        return result;
     }
 
     @Override
     public void deleteCompany(Long companyId) {
-        log.info("Удаление компании");
         companyRepository.deleteById(companyId);
+        log.info("Удалена компания с id = {}", companyId);
     }
 
     @Override
-    public List<CompanyDtoFullResponse> findCompanies() {
-        log.info("Получение всех компаний");
-        List<Company> companies = companyRepository.findAll();
+    public Page<CompanyDtoFullResponse> findCompanies(Integer from, Integer size) {
+        Pageable pageable = PageRequest.of(from, size);
+        Page<Company> companies = companyRepository.findAll(pageable);
 
-        List<Long> companiesIds = companies
+        List<Long> companiesIds = companies.getContent()
                 .stream()
                 .map(Company::getId)
                 .toList();
 
-        List<UserDtoResponse> users = usersClient.findUsersByCompanyIds(companiesIds);
-        Map<Long, List<UserDtoResponse>> userMap = users.stream()
+        Page<UserDtoResponse> users = usersClient.findUsersByCompanyIds(companiesIds);
+        Map<Long, List<UserDtoResponse>> userMap = users.getContent()
+                .stream()
                 .collect(Collectors.groupingBy(user -> user.getCompany().getId()));
 
-        return companies.stream()
+        List<CompanyDtoFullResponse> result = companies.getContent()
+                .stream()
                 .map(company -> companyMapper.toDto(company, userMap.get(company.getId())))
                 .toList();
+
+        Page<CompanyDtoFullResponse> pageResult = new PageImpl<>(
+                result,
+                companies.getPageable(),
+                companies.getTotalElements()
+        );
+
+        log.info("Получен список всех компаний в количестве: {}", result.size());
+        return pageResult;
+    }
+
+    @Override
+    public CompanyDtoShortResponse findCompanyByIdShort(Long companyId) {
+        Company company = getCompanyById(companyId);
+        CompanyDtoShortResponse result = companyMapper.toShortDto(company);
+        log.info("Найдена компания с id = {}, short dto: {}", companyId, result);
+        return result;
     }
 
     @Override
     public CompanyDtoFullResponse findCompanyById(Long companyId) {
-        log.info("Поиск компании по id");
+        Company company = getCompanyById(companyId);
 
-        Company company = companyRepository.findById(companyId).orElseThrow(() ->
-                new NotFoundException("Компания " + companyId + " не существует"));
+        Page<UserDtoResponse> users = usersClient.findUsersByCompanyIds(List.of(companyId));
+        CompanyDtoFullResponse result = companyMapper.toDto(company, users.getContent());
 
-        List<UserDtoResponse> users = usersClient.findUsersByCompanyIds(List.of(companyId));
-
-        return companyMapper.toDto(company, users);
+        log.info("Найдена компания с id = {}, DTO: {}", companyId, result);
+        return result;
     }
 
     @Override
-    public List<CompanyDtoShortResponse> findCompaniesByIds(List<Long> ids) {
-        List<Company> companies = companyRepository.findAllById(ids);
-        return companies.stream()
+    public Page<CompanyDtoShortResponse> findCompaniesByIds(List<Long> ids, Integer from, Integer size) {
+        Pageable pageable = PageRequest.of(from, size);
+        Page<Company> companies = companyRepository.findAllByIdIn(pageable, ids);
+
+        List<CompanyDtoShortResponse> result = companies.getContent()
+                .stream()
                 .map(companyMapper::toShortDto)
                 .toList();
+
+        Page<CompanyDtoShortResponse> pageResult = new PageImpl<>(
+                result,
+                companies.getPageable(),
+                companies.getTotalElements()
+        );
+
+        log.info("Найдены компании с id = {}, в количестве: {}", ids, result.size());
+        return pageResult;
     }
 
     @Override
     public CompanyDtoShortResponse updateCompanyById(CompanyDtoRequest dto, Long companyId) {
 
-        Company company = companyRepository.findById(companyId).orElseThrow(() ->
-                new NotFoundException("Компания " + companyId + " не существует"));
+        Company company = getCompanyById(companyId);
 
-        if (dto.getName() != null && !dto.getName().isBlank()) {
+        if (!Objects.equals(dto.getName(), company.getName())) {
             company.setName(dto.getName());
         }
 
-        if (dto.getBudget() != null && dto.getBudget() >= 0) {
+        if (!Objects.equals(dto.getBudget(), company.getBudget())) {
             company.setBudget(dto.getBudget());
         }
 
-        Company result = companyRepository.save(company);
-        return companyMapper.toShortDto(result);
+        Company savedCompany = companyRepository.save(company);
+        CompanyDtoShortResponse result = companyMapper.toShortDto(savedCompany);
+        log.info("Обновлена компания, возвращаемый DTO: {}", result);
+        return result;
+    }
+
+    private void checkCompanyExistsByName(String name) {
+        if (companyRepository.existsByName(name)) {
+            throw new ConflictException("Компания с указанным названием уже существует");
+        }
+    }
+
+    private Company getCompanyById(Long id) {
+        return companyRepository.findById(id).orElseThrow(() ->
+                new NotFoundException("Компания " + id + " не существует"));
     }
 }

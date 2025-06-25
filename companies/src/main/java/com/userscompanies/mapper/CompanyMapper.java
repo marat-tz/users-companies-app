@@ -15,16 +15,16 @@ import java.util.List;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface CompanyMapper {
 
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "budget", source = "budget")
+    CompanyDtoShortResponse toShortDto(Company company);
+
     @Mapping(target = "id", source = "company.id")
     @Mapping(target = "name", source = "company.name")
     @Mapping(target = "budget", source = "company.budget")
     @Mapping(target = "users", source = "users")
     CompanyDtoFullResponse toDto(Company company, List<UserDtoResponse> users);
-
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "name", source = "name")
-    @Mapping(target = "budget", source = "budget")
-    CompanyDtoShortResponse toShortDto(Company company);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "name", source = "name")
