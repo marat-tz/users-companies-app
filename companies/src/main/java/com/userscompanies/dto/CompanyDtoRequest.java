@@ -1,5 +1,6 @@
 package com.userscompanies.dto;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
@@ -21,5 +22,6 @@ public class CompanyDtoRequest {
     @Size(min = 1, max = 250)
     String name;
 
+    @Min(0)
     Double budget;
 }

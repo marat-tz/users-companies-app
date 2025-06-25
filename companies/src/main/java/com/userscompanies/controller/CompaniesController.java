@@ -56,7 +56,7 @@ public class CompaniesController {
 
     @PatchMapping("/{companyId}")
     @ResponseStatus(HttpStatus.OK)
-    public CompanyDtoShortResponse updateCompanyById(@RequestBody CompanyDtoRequest dto, @PathVariable Long companyId) {
+    public CompanyDtoShortResponse updateCompanyById(@Valid @RequestBody CompanyDtoRequest dto, @PathVariable Long companyId) {
         log.info("Обновление компании с id = {}, содержимое входящего DTO = {}", companyId, dto);
         return companyService.updateCompanyById(dto, companyId);
     }

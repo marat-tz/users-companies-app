@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -116,11 +117,11 @@ public class CompanyServiceImpl implements CompanyService {
 
         Company company = getCompanyById(companyId);
 
-        if (dto.getName() != null && !dto.getName().isBlank()) {
+        if (!Objects.equals(dto.getName(), company.getName())) {
             company.setName(dto.getName());
         }
 
-        if (dto.getBudget() != null && dto.getBudget() >= 0) {
+        if (!Objects.equals(dto.getBudget(), company.getBudget())) {
             company.setBudget(dto.getBudget());
         }
 
