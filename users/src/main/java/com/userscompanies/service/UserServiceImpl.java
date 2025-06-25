@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<UserDtoResponse> findUsers(List<Long> companyId, Integer from, Integer size) {
         Page<User> usersPage;
-        Pageable pageable = PageRequest.of(from / size, size);
+        Pageable pageable = PageRequest.of(from, size);
 
         if (companyId == null) {
             usersPage = userRepository.findAll(pageable);

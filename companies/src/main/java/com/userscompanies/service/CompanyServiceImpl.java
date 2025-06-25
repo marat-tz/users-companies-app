@@ -52,7 +52,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public Page<CompanyDtoFullResponse> findCompanies(Integer from, Integer size) {
-        Pageable pageable = PageRequest.of(from / size, size);
+        Pageable pageable = PageRequest.of(from, size);
         Page<Company> companies = companyRepository.findAll(pageable);
 
         List<Long> companiesIds = companies.getContent()
@@ -93,7 +93,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public Page<CompanyDtoShortResponse> findCompaniesByIds(List<Long> ids, Integer from, Integer size) {
-        Pageable pageable = PageRequest.of(from / size, size);
+        Pageable pageable = PageRequest.of(from, size);
         Page<Company> companies = companyRepository.findAllByIdIn(pageable, ids);
 
         List<CompanyDtoShortResponse> result = companies.getContent()
