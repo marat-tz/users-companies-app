@@ -42,5 +42,6 @@ eureka:
   client:
     service-url:
       defaultZone: http://eureka-server:8761/eureka  # eureka-server
+#      defaultZone: http://localhost:8761/eureka  # eureka-server
     register-with-eureka: true  # Регистрация включена (по умолчанию true)
     fetch-registry: true        # Получение списка сервисов (по умолчанию true)
