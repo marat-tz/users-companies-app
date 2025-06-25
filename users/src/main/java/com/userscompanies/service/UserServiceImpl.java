@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -110,15 +111,15 @@ public class UserServiceImpl implements UserService {
 
         CompanyDtoFullResponse companyDto = getCompanyById(dto.getCompanyId());
 
-        if (dto.getFirstName() != null && !dto.getFirstName().isBlank()) {
+        if (!Objects.equals(dto.getFirstName(), user.getFirstName())) {
             user.setFirstName(dto.getFirstName());
         }
 
-        if (dto.getLastName() != null && !dto.getLastName().isBlank()) {
+        if (!Objects.equals(dto.getLastName(), user.getLastName())) {
             user.setLastName(dto.getLastName());
         }
 
-        if (dto.getPhone() != null && !dto.getPhone().isBlank()) {
+        if (!Objects.equals(dto.getPhone(), user.getPhone())) {
             user.setPhone(dto.getPhone());
         }
 
