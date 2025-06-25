@@ -7,7 +7,6 @@ import com.userscompanies.dto.CompanyDtoShortResponse;
 import com.userscompanies.dto.UserDtoResponse;
 import com.userscompanies.exception.ConflictException;
 import com.userscompanies.exception.NotFoundException;
-import com.userscompanies.mapper.CommonCompanyMapper;
 import com.userscompanies.mapper.CompanyMapper;
 import com.userscompanies.model.Company;
 import com.userscompanies.repository.CompanyRepository;
@@ -79,6 +78,14 @@ public class CompanyServiceImpl implements CompanyService {
 
         log.info("Получен список всех компаний в количестве: {}", result.size());
         return pageResult;
+    }
+
+    @Override
+    public CompanyDtoShortResponse findCompanyByIdShort(Long companyId) {
+        Company company = getCompanyById(companyId);
+        CompanyDtoShortResponse result = companyMapper.toShortDto(company);
+        log.info("Найдена компания с id = {}, short dto: {}", companyId, result);
+        return result;
     }
 
     @Override

@@ -1,13 +1,11 @@
 package com.userscompanies.service;
 
 import com.userscompanies.client.CompaniesClient;
-import com.userscompanies.dto.CompanyDtoFullResponse;
 import com.userscompanies.dto.CompanyDtoShortResponse;
 import com.userscompanies.dto.UserDtoRequest;
 import com.userscompanies.dto.UserDtoResponse;
 import com.userscompanies.exception.ConflictException;
 import com.userscompanies.exception.NotFoundException;
-import com.userscompanies.mapper.CommonCompanyMapper;
 import com.userscompanies.mapper.UserMapper;
 import com.userscompanies.model.User;
 import com.userscompanies.repository.UserRepository;
@@ -36,14 +34,12 @@ public class UserServiceImpl implements UserService {
     final CompaniesClient companiesClient;
     final UserRepository userRepository;
     final UserMapper userMapper;
-    final CommonCompanyMapper commonCompanyMapper;
 
     @Override
     public UserDtoResponse createUser(UserDtoRequest dto) {
         checkUserExistsByPhone(dto.getPhone());
 
-        CompanyDtoShortResponse companyDtoShort =
-                commonCompanyMapper.fullToShortDto(getCompanyById(dto.getCompanyId()));
+        CompanyDtoShortResponse companyDtoShort = getCompanyById(dto.getCompanyId());
 
         User user = userRepository.save(userMapper.toEntity(dto));
         UserDtoResponse result = userMapper.toDto(user, companyDtoShort);
@@ -98,8 +94,8 @@ public class UserServiceImpl implements UserService {
     public UserDtoResponse findUserById(Long userId) {
         User user = getUserById(userId);
 
-        CompanyDtoFullResponse response = getCompanyById(user.getCompanyId());
-        UserDtoResponse result = userMapper.toDto(user, commonCompanyMapper.fullToShortDto(response));
+        CompanyDtoShortResponse response = getCompanyById(user.getCompanyId());
+        UserDtoResponse result = userMapper.toDto(user, response);
 
         log.info("Найден пользователь с id = {}, возвращаемый DTO: {}", userId, result);
         return result;
@@ -109,7 +105,7 @@ public class UserServiceImpl implements UserService {
     public UserDtoResponse updateUserById(UserDtoRequest dto, Long userId) {
         User user = getUserById(userId);
 
-        CompanyDtoFullResponse companyDto = getCompanyById(dto.getCompanyId());
+        CompanyDtoShortResponse companyDto = getCompanyById(dto.getCompanyId());
 
         if (!Objects.equals(dto.getFirstName(), user.getFirstName())) {
             user.setFirstName(dto.getFirstName());
@@ -124,13 +120,13 @@ public class UserServiceImpl implements UserService {
         }
 
         User savedUser = userRepository.save(user);
-        UserDtoResponse result = userMapper.toDto(savedUser, commonCompanyMapper.fullToShortDto(companyDto));
+        UserDtoResponse result = userMapper.toDto(savedUser, companyDto);
 
         log.info("Обновлён пользователь с id = {}, возвращаемый DTO: {}", userId, result);
         return result;
     }
 
-    private CompanyDtoFullResponse getCompanyById(Long companyId) {
+    private CompanyDtoShortResponse getCompanyById(Long companyId) {
         try {
             return companiesClient.findCompany(companyId).getBody();
         } catch (FeignException.NotFound e) {

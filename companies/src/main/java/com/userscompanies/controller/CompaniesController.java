@@ -46,6 +46,12 @@ public class CompaniesController {
         return companyService.findCompanies(from, size);
     }
 
+    @GetMapping("/short/{companyId}")
+    public CompanyDtoShortResponse findCompanyByIdShort(@PathVariable Long companyId) {
+        log.info("Получение списка всех компаний short dto");
+        return companyService.findCompanyByIdShort(companyId);
+    }
+
     @GetMapping("/ids")
     public Page<CompanyDtoShortResponse> findCompaniesByIds(@RequestParam(required = false) List<Long> ids,
                                                             @RequestParam(defaultValue = "0") Integer from,

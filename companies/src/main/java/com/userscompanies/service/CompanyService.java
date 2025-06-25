@@ -15,6 +15,8 @@ public interface CompanyService {
 
     Page<CompanyDtoFullResponse> findCompanies(Integer from, Integer size);
 
+    CompanyDtoShortResponse findCompanyByIdShort(Long companyId);
+
     CompanyDtoFullResponse findCompanyById(Long userId);
 
     Page<CompanyDtoShortResponse> findCompaniesByIds(List<Long> ids, Integer from, Integer size);
